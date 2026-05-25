@@ -1,0 +1,16 @@
+[
+  {
+    "id": "tiger_i",
+    "name": "Tiger I",
+    "scene": "res://tanks/TigerI.tscn",
+    "icon": "res://ui/icons/tiger_i.png",
+    "description": "Тяжёлый немецкий танк среднего уровня."
+  },
+  {
+    "id": "is_3",
+    "name": "ИС-3",
+    "scene": "res://tanks/IS3.tscn",
+    "icon": "res://ui/icons/is3.png",
+    "description": "Советский тяжёлый танк с хорошей бронёй."
+  }
+]

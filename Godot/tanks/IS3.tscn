@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[node name="IS3" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = BoxMesh {
+    size = Vector3( 2.8, 1.2, 3.5 )
+}
+transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0 )
+
+[node name="Turret" type="MeshInstance3D" parent="."]
+mesh = CylinderMesh {
+    radius = 0.7
+    height = 0.7
+}
+transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0 )

@@ -1,0 +1,76 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource path="res://Godot/Garage.gd" type="Script" id=1]
+[ext_resource path="res://Godot/PreviewRotator.gd" type="Script" id=2]
+[ext_resource path="res://Godot/TankSelector.gd" type="Script" id=3]
+
+[node name="Garage" type="Node3D"]
+script = ExtResource( 1 )
+
+[node name="PreviewRotator" type="Node3D" parent="."]
+script = ExtResource( 2 )
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D( 0.94, 0, 0.342, 0, 1, 0, -0.342, 0, 0.94, 0, 2.8, 8 )
+current = true
+fov = 60.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D( 0.5, 0.5, 0.707, 0, 0.707, -0.707, -0.866, 0.5, 0.0, 0, 4, -6 )
+light_energy = 2.0
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 1 )
+
+[node name="TankSelector" type="Node" parent="."]
+script = ExtResource( 3 )
+preview_anchor_path = NodePath("PreviewRotator")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="UI"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 12.0
+margin_top = 12.0
+margin_right = 312.0
+margin_bottom = 172.0
+
+[node name="Panel" type="Panel" parent="UI/Control"]
+margin_right = 300.0
+margin_bottom = 160.0
+
+[node name="TankLabel" type="Label" parent="UI/Control/Panel"]
+margin_left = 12.0
+margin_top = 10.0
+margin_right = 288.0
+margin_bottom = 34.0
+text = "Текущий танк:"
+
+[node name="PreviousButton" type="Button" parent="UI/Control/Panel"]
+margin_left = 12.0
+margin_top = 44.0
+margin_right = 142.0
+margin_bottom = 80.0
+text = "Предыдущий"
+
+[node name="NextButton" type="Button" parent="UI/Control/Panel"]
+margin_left = 158.0
+margin_top = 44.0
+margin_right = 288.0
+margin_bottom = 80.0
+text = "Следующий"
+
+[node name="SelectButton" type="Button" parent="UI/Control/Panel"]
+margin_left = 12.0
+margin_top = 92.0
+margin_right = 288.0
+margin_bottom = 128.0
+text = "Сохранить выбор"
+
+[sub_resource type="Environment" id=1]
+background_mode = 2
+ambient_light_energy = 0.8
+
+auto_load = [  ]
