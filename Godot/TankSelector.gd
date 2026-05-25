@@ -19,43 +19,39 @@ func _ready() -> void:
 	update_preview()
 
 func load_tank_data() -> void:
-	var file = FileAccess.open(config_path, FileAccess.ModeFlags.READ)
-	if file == null:
-		push_error("TankSelector: не удалось открыть " + config_path)
+	if not FileAccess.file_exists(config_path):
+		push_error("TankSelector: файл не найден: " + config_path)
 		return
-	var json_text = file.get_as_text()
+		
+	var file = FileAccess.open(config_path, FileAccess.ModeFlags.READ)
+	var json_text: String = file.get_as_text()
 	file.close()
 
-	var result = JSON.parse_string(json_text)
-	if result.error != OK:
-		push_error("TankSelector: ошибка JSON " + str(result.error) + " в " + config_path + ": " + str(result.error_string))
+	var json = JSON.new()
+	var error = json.parse(json_text)
+	if error != OK:
+		push_error("TankSelector: ошибка JSON")
 		return
 
-	tank_list = result.result if result.result is Array else []
+	var data = json.data
+	tank_list = data if data is Array else []
 
 func load_saved_tank() -> void:
 	var cfg = ConfigFile.new()
-	var err = cfg.load(SAVE_FILE)
-	if err == OK:
+	if cfg.load(SAVE_FILE) == OK:
 		selected_id = str(cfg.get_value("tank", save_key, ""))
-		if selected_id != "":
-			current_index = 0
-			for i in range(tank_list.size()):
-				var item = tank_list[i]
-				if str(item.get("id", "")) == selected_id:
-					current_index = i
-					break
-			if current_index < 0 or current_index >= tank_list.size():
-				current_index = 0
-	else:
-		current_index = 0
+		for i in range(tank_list.size()):
+			if str(tank_list[i].get("id", "")) == selected_id:
+				current_index = i
+				break
+
+	current_index = clamp(current_index, 0, tank_list.size() - 1)
 
 func save_selected_tank() -> void:
-	if current_index < 0 or current_index >= tank_list.size():
+	if tank_list.is_empty():
 		return
 	selected_id = str(tank_list[current_index].get("id", ""))
 	var cfg = ConfigFile.new()
-	cfg.load(SAVE_FILE)
 	cfg.set_value("tank", save_key, selected_id)
 	cfg.save(SAVE_FILE)
 	emit_signal("selected_tank_changed", selected_id)
@@ -65,55 +61,35 @@ func update_preview() -> void:
 		current_preview.queue_free()
 		current_preview = null
 
-	if tank_list.empty():
+	if tank_list.is_empty():
 		return
 
 	current_index = clamp(current_index, 0, tank_list.size() - 1)
-	var item = tank_list[current_index]
-	var scene_path = str(item.get("scene", ""))
+	var item: Dictionary = tank_list[current_index]
+	var scene_path: String = str(item.get("scene", ""))
+	
 	if scene_path == "":
 		return
 
 	var anchor = get_node_or_null(preview_anchor_path) as Node3D
 	if anchor == null:
-		push_error("TankSelector: preview_anchor_path не задан или не Node3D")
 		return
 
-	var packed = ResourceLoader.load(scene_path) as PackedScene
+	var packed = ResourceLoader.load(scene_path)
 	if packed == null:
-		push_error("TankSelector: не удалось загрузить сцену танка: " + scene_path)
+		push_error("Не удалось загрузить: " + scene_path)
 		return
 
 	current_preview = packed.instantiate() as Node3D
-	if current_preview == null:
-		push_error("TankSelector: загруженная сцена не Node3D: " + scene_path)
-		return
-
 	anchor.add_child(current_preview)
 	current_preview.transform = Transform3D.IDENTITY
-	current_preview.scale = Vector3.ONE
 
 func next_tank() -> void:
-	if tank_list.empty():
-		return
+	if tank_list.is_empty(): return
 	current_index = (current_index + 1) % tank_list.size()
 	update_preview()
 
 func previous_tank() -> void:
-	if tank_list.empty():
-		return
+	if tank_list.is_empty(): return
 	current_index = (current_index - 1 + tank_list.size()) % tank_list.size()
 	update_preview()
-
-func select_current_tank() -> void:
-	save_selected_tank()
-
-func get_selected_tank_scene_path() -> String:
-	if current_index >= 0 and current_index < tank_list.size():
-		return str(tank_list[current_index].get("scene", ""))
-	return ""
-
-func get_current_tank_data() -> Dictionary:
-	if current_index >= 0 and current_index < tank_list.size():
-		return tank_list[current_index]
-	return {}
